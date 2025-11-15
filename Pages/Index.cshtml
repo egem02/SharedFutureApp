@@ -1,0 +1,28 @@
+﻿@page "/"
+
+
+<link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
+
+
+<div class="container">
+    <h1>💖 Shared Future Planner 💖</h1>
+    <!-- index.html veya page içine ekle -->
+    <div id="toast" style="position: fixed; bottom: 20px; right: 20px; background: #333; color: #fff; padding: 10px 20px; border-radius: 5px; display: none;"></div>
+
+    <div class="home-text">
+        <p class="lead">Together we plan our dreams and memories 🌙</p>
+        <p class="lead">Welcome to our shared space — where every plan becomes a memory and could be your future.</p>
+    </div>
+
+    <div class="gif-container">
+        <img src="https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dzgwcGRwNGZ4NGgwN213YmJnbGRrMHI0bmZrZXE0azVmcmxueXRtbCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mHcEcam5FtKQE/giphy.gif"
+             alt="cute animated GIF">
+    </div>
+
+    <div class="mt-4">
+        <a class="button btn-pink mx-2" href="/bucketlist"><span class="icon">🎯</span> Go to Bucket List</a>
+        <a class="button btn-purple mx-2" href="/wishlist"><span class="icon">💫</span> Go to Wishlist</a>
+        <a class="button btn-pink mx-2" href="/photos"><span class="icon">💫</span> Go to Gallery</a>
+    </div>
+</div>
+<script type="module" src ="js/app-init.js"></script>

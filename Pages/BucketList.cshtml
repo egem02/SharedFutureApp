@@ -1,0 +1,39 @@
+﻿@page "/bucketlist"
+<body data-page="bucket">
+    <link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
+
+    <div class="container">
+        <h1>🎒 Bucket List</h1>
+
+        <!-- ADD AREA -->
+        <div class="add-item">
+            <input id="bucketEmoji" type="text" placeholder="😊" maxlength="2" class="emoji-input">
+            <input id="bucketInput" type="text" placeholder="Add Bucket Item">
+            <input id="bucketDate" type="date">
+            <button id="bucketAddBtn" class="button btn-pink">Add</button>
+        </div>
+
+        <!-- SHOW/HIDE BUTTON -->
+        <button id="bucketToggleBtn" class="button btn-pink">Hide List</button>
+
+        <!-- LIST SECTIONS -->
+        <div id="bucketSections">
+
+            <h3>Past</h3>
+            <div id="bucketPastContainer" class="list-container"></div>
+
+            <h3>Today</h3>
+            <div id="bucketTodayContainer" class="list-container"></div>
+
+            <h3>Future</h3>
+            <div id="bucketFutureContainer" class="list-container"></div>
+
+        </div>
+
+        <div class="mt-4">
+            <a class="button btn-pink" href="/">Back</a>
+        </div>
+    </div>
+
+    <script type="module" src="js/app-init.js" defer></script>
+</body>

@@ -1,0 +1,22 @@
+﻿@page "/photos"
+<body data-page="photos">
+    <link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
+
+    <div class="container">
+        <h1>📸 Photo Gallery 📸</h1>
+
+        <div class="add-item">
+            <input type="file" id="photoFileInput" />
+            <button id="photoUploadBtn" class="button btn-pink">Upload</button>
+        </div>
+
+        <div class="list-container" id="photoContainer"></div>
+
+        <div class="mt-4">
+            <a class="button btn-pink" href="/">Back to Home</a>
+        </div>
+    </div>
+
+    <script src="js/photos.js" defer></script>
+    <script type="module" src="js/app-init.js" defer></script>
+</body>

@@ -1,0 +1,39 @@
+﻿@page "/wishlist"
+<body data-page="wishlist">
+    <link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
+
+    <div class="container">
+        <h1>💝 Wishlist</h1>
+
+        <!-- ADD WISHLIST ITEM -->
+        <div class="add-item">
+            <input id="wishlistEmoji" type="text" placeholder="😊" maxlength="2" class="emoji-input">
+            <input id="wishlistInput" type="text" placeholder="Add Wishlist Item">
+            <input id="wishlistDate" type="date">
+            <button id="wishlistAddBtn" class="button btn-pink">Add</button>
+        </div>
+
+        <!-- SHOW/HIDE BUTTON -->
+        <button id="wishlistToggleBtn" class="button btn-pink">Hide List</button>
+
+        <!-- LIST SECTIONS -->
+        <div id="wishlistSections">
+
+            <h3>Past</h3>
+            <div id="wishlistPastContainer" class="list-container"></div>
+
+            <h3>Today</h3>
+            <div id="wishlistTodayContainer" class="list-container"></div>
+
+            <h3>Future</h3>
+            <div id="wishlistFutureContainer" class="list-container"></div>
+
+        </div>
+
+        <div class="mt-4">
+            <a class="button btn-pink" href="/">Back</a>
+        </div>
+    </div>
+
+    <script type="module" src="js/app-init.js" defer></script>
+</body>
