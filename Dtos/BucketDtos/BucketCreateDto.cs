@@ -2,11 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 
 
-namespace SharedFutureApp.Backend.Dtos.BucketDtos;
-public class BucketUpdateDto
+namespace SharedFutureApp.Dtos.BucketDtos;
+public class BucketCreateDto
 {
     [Required]
     public string? Title { get; set; }
+
     public DateTime? TargetDate { get; set; }
-    public bool IsDone { get; set; }
 }

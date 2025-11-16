@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SharedFutureApp.Backend.Data;
-using SharedFutureApp.Backend.Dtos;
-using SharedFutureApp.Backend.Models;
+using SharedFutureApp.Data;
+using SharedFutureApp.Dtos;
+using SharedFutureApp.Models;
 
-namespace SharedFutureApp.Backend.Controllers;
+namespace SharedFutureApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
