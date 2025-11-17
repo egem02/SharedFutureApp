@@ -1,7 +1,7 @@
-﻿// app-init.js
-document.addEventListener("DOMContentLoaded", () => {
+﻿document.addEventListener("DOMContentLoaded", () => {
     const page = document.body.dataset.page;
-  
+
+    // Sayfaya özel modüller
     if (page === "bucket") {
         import('./bucket.js').then(module => module.initBucket());
     } else if (page === "wishlist") {
@@ -9,4 +9,27 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (page === "photos") {
         import('./photos.js').then(module => module.initPhotos());
     }
+
+    // Arka plan müziği
+    const audio = document.getElementById("bg-audio");
+    if (!audio) return;
+
+    let song = "";
+    switch (page) {
+        case "home": song = "/audio/veben.mp3"; break;
+        case "bucket": song = "/audio/dem.mp3"; break;
+        case "wishlist": song = "/audio/sadece.mp3"; break;
+        case "photos": song = "/audio/tekrardan.mp3"; break;
+    }
+
+    audio.src = song;
+
+    // İlk kullanıcı etkileşimi ile çal
+    function startMusic() {
+        audio.play().catch(err => console.log("Audio play blocked:", err));
+        document.removeEventListener("click", startMusic);
+    }
+
+    // Sayfa yüklendiğinde veya kullanıcı tıkladığında çal
+    document.addEventListener("click", startMusic);
 });
