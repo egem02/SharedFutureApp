@@ -3,6 +3,11 @@
     const fileInput = document.getElementById("photoFileInput");
     const container = document.getElementById("photoContainer");
 
+    if (!uploadBtn || !fileInput || !container) {
+        console.error("Upload button veya container bulunamadı!");
+        return;
+    }
+
     // Load existing photos
     fetch("/api/photo")
         .then(res => res.json())
@@ -10,7 +15,7 @@
             items.forEach(photo => addPhotoToUI(photo));
         });
 
-    uploadBtn?.addEventListener("click", async () => {
+    uploadBtn.addEventListener("click", async () => {
         const file = fileInput.files[0];
         if (!file) return;
 
