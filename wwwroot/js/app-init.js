@@ -1,4 +1,5 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
+﻿
+document.addEventListener("DOMContentLoaded", () => {
     const page = document.body.dataset.page;
 
     // Sayfaya özel modüller
@@ -8,6 +9,7 @@
         import('./wishlist.js').then(module => module.initWishlist());
     } else if (page === "photos") {
         import('./photos.js').then(module => module.initPhotos());
+        import('./album.js').then(module => module.initAlbum());
     }
 
     // Arka plan müziği
@@ -16,11 +18,21 @@
 
     let song = "";
     switch (page) {
-        case "home": song = "/audio/veben.mp3"; break;
-        case "bucket": song = "/audio/dem.mp3"; break;
-        case "wishlist": song = "/audio/sadece.mp3"; break;
-        case "photos": song = "/audio/tekrardan.mp3"; break;
+        case "":
+        case "/":
+            song = "/audio/veben.mp3"; // Ana sayfa
+            break;
+        case "bucket":
+            song = "/audio/dem.mp3";
+            break;
+        case "wishlist":
+            song = "/audio/sadece.mp3";
+            break;
+        case "photos":
+            song = "/audio/tekrardan.mp3";
+            break;
     }
+
 
     audio.src = song;
 
@@ -32,4 +44,6 @@
 
     // Sayfa yüklendiğinde veya kullanıcı tıkladığında çal
     document.addEventListener("click", startMusic);
+
+   
 });

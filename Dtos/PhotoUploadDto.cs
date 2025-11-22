@@ -4,6 +4,7 @@ namespace SharedFutureApp.Dtos;
 
 public class PhotoUploadDto
 {
-   
-    public IFormFile Photo { get; set; }
+    public string? FileName { get; set; }
+    public int? AlbumId { get; set; }
+    public IFormFile? Photo { get; set; }
 }

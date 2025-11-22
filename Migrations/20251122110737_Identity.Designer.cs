@@ -12,8 +12,8 @@ using SharedFutureApp.Data;
 namespace SharedFutureApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251113182625_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251122110737_Identity")]
+    partial class Identity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace SharedFutureApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SharedFutureApp.Backend.Models.BucketItem", b =>
+            modelBuilder.Entity("SharedFutureApp.Models.Album", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,20 +33,37 @@ namespace SharedFutureApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Albums");
+                });
+
+            modelBuilder.Entity("SharedFutureApp.Models.BucketItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("IsDone")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("PhotoId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("TargetDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("TargetDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -54,18 +71,19 @@ namespace SharedFutureApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PhotoId");
-
                     b.ToTable("BucketItems");
                 });
 
-            modelBuilder.Entity("SharedFutureApp.Backend.Models.Photo", b =>
+            modelBuilder.Entity("SharedFutureApp.Models.Photo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AlbumId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FileName")
                         .IsRequired()
@@ -75,15 +93,17 @@ namespace SharedFutureApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("UploadedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AlbumId");
 
                     b.ToTable("Photos");
                 });
 
-            modelBuilder.Entity("SharedFutureApp.Backend.Models.WishlistItem", b =>
+            modelBuilder.Entity("SharedFutureApp.Models.WishlistItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,20 +111,17 @@ namespace SharedFutureApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime?>("EventDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("EventDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("IsDone")
                         .HasColumnType("bit");
-
-                    b.Property<int?>("PhotoId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -112,27 +129,22 @@ namespace SharedFutureApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PhotoId");
-
                     b.ToTable("WishlistItems");
                 });
 
-            modelBuilder.Entity("SharedFutureApp.Backend.Models.BucketItem", b =>
+            modelBuilder.Entity("SharedFutureApp.Models.Photo", b =>
                 {
-                    b.HasOne("SharedFutureApp.Backend.Models.Photo", "Photo")
-                        .WithMany()
-                        .HasForeignKey("PhotoId");
+                    b.HasOne("SharedFutureApp.Models.Album", "Album")
+                        .WithMany("Photos")
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("Photo");
+                    b.Navigation("Album");
                 });
 
-            modelBuilder.Entity("SharedFutureApp.Backend.Models.WishlistItem", b =>
+            modelBuilder.Entity("SharedFutureApp.Models.Album", b =>
                 {
-                    b.HasOne("SharedFutureApp.Backend.Models.Photo", "Photo")
-                        .WithMany()
-                        .HasForeignKey("PhotoId");
-
-                    b.Navigation("Photo");
+                    b.Navigation("Photos");
                 });
 #pragma warning restore 612, 618
         }

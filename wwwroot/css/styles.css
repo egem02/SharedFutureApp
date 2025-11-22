@@ -1,8 +1,21 @@
 ﻿/* ===============================
    GENEL BODY & BACKGROUND
    =============================== */
+/* Tüm sayfalar ve tüm etkileşimli elemanlar için paw imleci */
+
+/* Global Paw Cursor */
+/* ===========================================
+ */
+*{
+    cursor: url('/paw/WhiteGrey-Cat-Paw-PNG.png') 16 16,auto;
+}
+
+
+
+
 body {
     margin: 0;
+    padding: 2rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
     background-size: 400% 400%;
@@ -189,6 +202,42 @@ h1 {
         color: #e0c3fc;
         text-shadow: 0 0 2px rgba(0,0,0,0.7), 1px 1px 2px rgba(0,0,0,0.5);
     }
+/* ===============================
+   ALBUM SELECT & FILTER
+   =============================== */
+.add-item select,
+.list-item-filter select {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background-color: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+    .add-item select:hover,
+    .list-item-filter select:hover {
+        background-color: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.4);
+    }
+
+.list-item-filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+    .list-item-filter label {
+        font-weight: 600;
+        color: #ffb6c1;
+        font-size: 1rem;
+        text-shadow: 0 0 2px rgba(0,0,0,0.6);
+    }
 
 /* ===============================
    RESPONSIVE
@@ -313,6 +362,35 @@ h1 {
         color: white;
         box-shadow: 0 0 8px #ff4d6d, 0 0 20px #ff6b81;
     }
+
+/* Emoji input için */
+/* ===============================
+   Emoji Input - Wishlist & Bucket
+   =============================== */
+#wishlistEmoji,
+#bucketEmoji {
+    width: 50px; /* Kare genişliği */
+    height: 50px; /* Kare yüksekliği */
+    font-size: 28px; /* Emoji boyutu */
+    text-align: center; /* Emoji ortalanır */
+    padding: 0; /* İç boşluğu sıfırla */
+    border-radius: 8px; /* Hafif köşeler yuvarlak */
+    border: 1px solid #ccc; /* Hafif çerçeve */
+    background-color: #fff; /* Arka plan */
+    cursor: pointer; /* Tıklanabilir hissi */
+    transition: transform 0.1s ease; /* Küçük animasyon efekti */
+}
+
+    /* Hover veya focus efekti */
+    #wishlistEmoji:hover,
+    #wishlistEmoji:focus,
+    #bucketEmoji:hover,
+    #bucketEmoji:focus {
+        transform: scale(1.1); /* Hafif büyüme efekti */
+        outline: none; /* Varsayılan mavi outline kaldır */
+        border-color: #ff6f91; /* Hoverda çerçeve rengi değişir */
+    }
+
 
 /* Responsive */
 @media (max-width: 600px) {

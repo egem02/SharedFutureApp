@@ -1,19 +1,41 @@
 ﻿@page "/photos"
+
 <body data-page="photos">
     <link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
+
+    <!-- Arka plan müziği -->
     <audio id="bg-audio" autoplay loop>
         <source src="/audio/tekrardan.mp3" type="audio/mpeg">
     </audio>
 
-
     <div class="container">
         <h1>📸 Photo Gallery 📸</h1>
 
+        <!-- Fotoğraf yükleme ve albüm oluşturma alanı -->
         <div class="add-item">
+            <!-- Fotoğraf yükleme -->
             <input type="file" id="photoFileInput" />
+            <select id="albumSelect">
+                <option value="">No Album</option>
+            </select>
             <button id="photoUploadBtn" class="button btn-pink">Upload</button>
+
+            <!-- Yeni albüm oluşturma -->
+            <div class="add-item" style="margin-top:10px;">
+                <input type="text" id="newAlbumName" placeholder="Enter Album Name" />
+                <button id="createAlbumBtn" class="button btn-purple">Create Album</button>
+            </div>
         </div>
 
+        <!-- Albüm filtresi -->
+        <div class="list-item-filter" style="margin:10px 0;">
+            <label for="albumFilter">Filter by Album:</label>
+            <select id="albumFilter">
+                <option value="">All Photos</option>
+            </select>
+        </div>
+
+        <!-- Fotoğrafların listeleneceği alan -->
         <div class="list-container" id="photoContainer"></div>
 
         <div class="mt-4">
@@ -21,6 +43,8 @@
         </div>
     </div>
 
+    <!-- Scriptler -->
     <script src="js/photos.js" defer></script>
-    <script type="module" src="js/app-init.js" defer></script>
+    <script src="js/album.js" defer></script>
+    <script src="js/app-init.js" defer></script>
 </body>

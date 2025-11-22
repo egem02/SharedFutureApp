@@ -18,7 +18,4 @@ public class WishlistItem
     public bool IsDone { get; set; } 
     public DateTimeOffset? CompletedAt { get; set; }
 
-    // Fotoğraf ilişkisi (opsiyonel)
-    public int? PhotoId { get; set; }
-    public Photo? Photo { get; set; }
 }

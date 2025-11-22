@@ -5,8 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SharedFutureApp.Dtos.BucketDtos;
 public class BucketCreateDto
 {
-    [Required]
-    public string? Title { get; set; }
+    public string Title { get; set; } = default!;
 
     public DateTime? TargetDate { get; set; }
 }

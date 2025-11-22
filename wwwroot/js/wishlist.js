@@ -11,8 +11,8 @@
     const toggleBtn = document.getElementById("wishlistToggleBtn");
     const sections = document.getElementById("wishlistSections");
 
-    // SHOW/HIDE LIST
-    toggleBtn.addEventListener("click", () => {
+    // SHOW/HIDE
+    toggleBtn?.addEventListener("click", () => {
         if (sections.style.display === "none") {
             sections.style.display = "block";
             toggleBtn.textContent = "Hide List";
@@ -25,9 +25,10 @@
     // LOAD EXISTING
     fetch("/api/wishlist")
         .then(res => res.json())
-        .then(items => items.forEach(item => addToUI(item)));
+        .then(items => items.forEach(item => addToUI(item)))
+        .catch(err => console.error("Wishlist load error:", err));
 
-    // ADD NEW WISHLIST ITEM
+    // ADD NEW ITEM
     addBtn?.addEventListener("click", async () => {
         const title = input.value.trim();
         const emoji = emojiInput.value.trim() || "💖";
@@ -35,22 +36,36 @@
 
         if (!title) return;
 
-        const res = await fetch("/api/wishlist", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                title: emoji + " " + title,
-                eventDate: date,
-                photoId: null
-            })
-        });
+        try {
+            const res = await fetch("/api/wishlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: emoji + " " + title,
+                    eventDate: date,
+                })
+            });
 
-        const data = await res.json();
-        addToUI(data);
+            if (!res.ok) {
+                console.error("POST failed:", res.status);
+                return;
+            }
 
-        input.value = "";
-        emojiInput.value = "";
-        dateInput.value = "";
+            const data = await res.json();
+
+            if (!data.id) {
+                console.warn("POST sonrası item ID yok", data);
+                return;
+            }
+
+            addToUI(data);
+
+            input.value = "";
+            emojiInput.value = "";
+            dateInput.value = "";
+        } catch (err) {
+            console.error("POST error:", err);
+        }
     });
 
     function addToUI(item) {
@@ -59,7 +74,7 @@
 
         div.innerHTML = `
             <span>${item.isDone ? "✅" : ""} ${item.title}
-            ${item.eventDate ? `<small>(${item.eventDate})</small>` : ""}</span>
+            ${item.eventDate ? `<small>(${new Date(item.eventDate).toLocaleDateString()})</small>` : ""}</span>
 
             <div class="btn-group">
                 <button class="button btn-pink doneBtn">Done</button>
@@ -67,32 +82,56 @@
             </div>
         `;
 
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-        if (item.eventDate < today) containerPast.appendChild(div);
-        else if (item.eventDate === today) containerToday.appendChild(div);
+        const itemDate = item.eventDate ? new Date(item.eventDate) : null;
+        if (itemDate) itemDate.setHours(0, 0, 0, 0);
+
+        if (!itemDate || itemDate < today) containerPast.appendChild(div);
+        else if (itemDate.getTime() === today.getTime()) containerToday.appendChild(div);
         else containerFuture.appendChild(div);
 
         // DONE BUTTON
         div.querySelector(".doneBtn").addEventListener("click", async () => {
-            await fetch(`/api/wishlist/${item.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    title: item.title,
-                    eventDate: item.eventDate,
-                    isDone: true,
-                    photoId: item.photoId
-                })
-            });
+            if (!item.id) {
+                console.warn("Item ID yok, PUT atlanıyor", item);
+                return;
+            }
 
-            div.querySelector("span").innerHTML = "✅ " + item.title;
+            try {
+                const res = await fetch(`/api/wishlist/${item.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: item.title,
+                        eventDate: item.eventDate,
+                        isDone: true
+                    })
+                });
+
+                if (!res.ok) console.error("PUT failed:", res.status);
+                else div.querySelector("span").innerHTML = "✅ " + item.title;
+            } catch (err) {
+                console.error("PUT error:", err);
+            }
         });
 
-        // DELETE BUTTON
+        const id = item.id || item.Id; // küçük/büyük harf farkı
         div.querySelector(".deleteBtn").addEventListener("click", async () => {
-            await fetch(`/api/wishlist/${item.id}`, { method: "DELETE" });
-            div.remove();
+            if (!id) {
+                console.warn("Item ID yok, DELETE atlanıyor", item);
+                div.remove();
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/wishlist/${id}`, { method: "DELETE" });
+                if (!res.ok) console.error("DELETE failed:", res.status);
+                else div.remove();
+            } catch (err) {
+                console.error("DELETE error:", err);
+            }
         });
     }
 }

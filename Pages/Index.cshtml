@@ -1,11 +1,10 @@
 ﻿@page "/"
 
-
+<body data-page="/">
 <link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
-<audio id="bg-audio" autoplay loop>
+<audio id="bg-audio" loop>
     <source src="/audio/veben.mp3" type="audio/mpeg">
 </audio>
-
 
 
 <div class="container">
@@ -21,7 +20,6 @@
     <div class="gif-container">
         <img src="https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dzgwcGRwNGZ4NGgwN213YmJnbGRrMHI0bmZrZXE0azVmcmxueXRtbCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mHcEcam5FtKQE/giphy.gif"
              alt="cute animated GIF">
-    </div>
 
     <div class="mt-4">
         <a class="button btn-pink mx-2" href="/bucketlist"><span class="icon">🎯</span> Go to Bucket List</a>
@@ -30,3 +28,5 @@
     </div>
 </div>
 <script type="module" src ="js/app-init.js"></script>
+</div>>
+</body>

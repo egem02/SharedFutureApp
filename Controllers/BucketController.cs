@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SharedFutureApp.Data;
 using SharedFutureApp.Dtos.BucketDtos;
 using SharedFutureApp.Models;
+using System.Net.Sockets;
 
 namespace SharedFutureApp.Controllers;
 
@@ -60,57 +61,60 @@ public class BucketController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<BucketItem>> Create([FromBody] BucketCreateDto dto)
     {
-        var item = new BucketItem
+        var bucket = new BucketItem
         {
             Title = dto.Title,
             TargetDate = dto.TargetDate,
-            CreatedAt = DateTime.Now,
+            CreatedAt = DateTimeOffset.Now,
             IsDone = false
         };
 
-        _context.BucketItems.Add(item);
+        _context.BucketItems.Add(bucket);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(Create), new { id = item.Id }, item);
+        // JSON’de id küçük harfli gelsin
+        return new JsonResult(new
+        {
+            id = bucket.Id,
+            title = bucket.Title,
+            targetDate = bucket.TargetDate,
+            isDone = bucket.IsDone
+        });
     }
 
-    // ---------------------------
-    // UPDATE (Done + Edit)
-    // ---------------------------
+    // UPDATE (done/edit)
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] BucketUpdateDto dto)
     {
-        var item = await _context.BucketItems.FindAsync(id);
-        if (item == null) return NotFound();
+        var bucket = await _context.BucketItems.FindAsync(id);
+        if (bucket == null) return NotFound();
 
-        item.Title = dto.Title;
-        item.TargetDate = dto.TargetDate;
+        bucket.Title = dto.Title ?? bucket.Title;
+        bucket.TargetDate = dto.TargetDate ?? bucket.TargetDate;
 
-        if (dto.IsDone && !item.IsDone)
+        if (dto.IsDone && !bucket.IsDone)
         {
-            item.IsDone = true;
-            item.CompletedAt = DateTime.Now;
+            bucket.IsDone = true;
+            bucket.CompletedAt = DateTimeOffset.Now;
         }
         else if (!dto.IsDone)
         {
-            item.IsDone = false;
-            item.CompletedAt = null;
+            bucket.IsDone = false;
+            bucket.CompletedAt = null;
         }
 
         await _context.SaveChangesAsync();
         return NoContent();
     }
 
-    // ---------------------------
     // DELETE
-    // ---------------------------
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var item = await _context.BucketItems.FindAsync(id);
-        if (item == null) return NotFound();
+        var bucket = await _context.BucketItems.FindAsync(id);
+        if (bucket == null) return NotFound();
 
-        _context.BucketItems.Remove(item);
+        _context.BucketItems.Remove(bucket);
         await _context.SaveChangesAsync();
 
         return NoContent();

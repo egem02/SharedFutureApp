@@ -8,7 +8,7 @@ namespace SharedFutureApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PhotoController : ControllerBase
+public partial class PhotoController : ControllerBase
 {
     private readonly IWebHostEnvironment _env;
     private readonly ApplicationDbContext _context;
@@ -19,20 +19,41 @@ public class PhotoController : ControllerBase
         _env = env;
     }
 
-    // Tüm fotoğrafları getir (UI refresh için)
+    // Tüm fotoğrafları getir (albüm bilgisi ile)
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Photo>>> GetAll()
+    public async Task<ActionResult<IEnumerable<object>>> GetAll()
     {
-        return await _context.Photos.ToListAsync();
+        var photos = await _context.Photos
+            .Include(p => p.Album)
+            .Select(p => new
+            {
+                p.Id,
+                p.FileName,
+                p.FilePath,
+                p.UploadedAt,
+                p.AlbumId,            // PascalCase
+                AlbumName = p.Album != null ? p.Album.Name : null // PascalCase
+            })
+            .ToListAsync();
+
+        return Ok(photos);
     }
 
-    // Fotoğraf yükleme endpoint
+    // Fotoğraf yükleme endpoint (albüm desteği ile)
     [HttpPost("upload")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<Photo>> Upload([FromForm] PhotoUploadDto dto)
+    public async Task<ActionResult<object>> Upload([FromForm] PhotoUploadDto dto)
     {
         if (dto.Photo == null)
-            return BadRequest("Photo file is required.");
+            return BadRequest("Fotoğraf dosyası gereklidir.");
+
+        // Albüm varsa kontrol et
+        if (dto.AlbumId.HasValue)
+        {
+            var album = await _context.Albums.FindAsync(dto.AlbumId.Value);
+            if (album == null)
+                return BadRequest("Albüm bulunamadı");
+        }
 
         // Kayıt klasörü
         var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
@@ -51,13 +72,30 @@ public class PhotoController : ControllerBase
         {
             FileName = fileName,
             FilePath = "/uploads/" + fileName,
-            UploadedAt = DateTime.Now
+            UploadedAt = DateTimeOffset.Now,
+            AlbumId = dto.AlbumId
         };
 
         _context.Photos.Add(photo);
         await _context.SaveChangesAsync();
 
-        return Ok(photo);
+        // Albüm adı ile döndür
+        var albumName = dto.AlbumId.HasValue
+            ? await _context.Albums
+                .Where(a => a.Id == dto.AlbumId.Value)
+                .Select(a => a.Name)
+                .FirstOrDefaultAsync()
+            : null;
+
+        return Ok(new
+        {
+            photo.Id,
+            photo.FileName,
+            photo.FilePath,
+            photo.UploadedAt,
+            photo.AlbumId,   // PascalCase
+            AlbumName = albumName       // PascalCase
+        });
     }
 
     // Fotoğraf sil
@@ -65,7 +103,8 @@ public class PhotoController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var photo = await _context.Photos.FindAsync(id);
-        if (photo == null) return NotFound();
+        if (photo == null)
+            return NotFound();
 
         // Fiziksel dosyayı da sil
         var fullPath = Path.Combine(_env.WebRootPath, "uploads", photo.FileName);

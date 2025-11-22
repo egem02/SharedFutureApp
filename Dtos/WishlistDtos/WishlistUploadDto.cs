@@ -4,9 +4,6 @@ namespace SharedFutureApp.Dtos.WishlistDtos;
 
 public class WishlistUploadDto
 {
-    [Required]
-    public string? Title { get; set; }
+    public string Title { get; set; } = default!;
 
-    public IFormFile? Photo { get; set; }
-    public int? PhotoId { get; set; }
 }

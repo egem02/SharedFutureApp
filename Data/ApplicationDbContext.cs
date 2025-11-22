@@ -14,6 +14,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<BucketItem> BucketItems { get; set; }
     public DbSet<WishlistItem> WishlistItems { get; set; }
     public DbSet<Photo> Photos { get; set; }
+    public DbSet<Album> Albums { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,6 +22,21 @@ public class ApplicationDbContext : DbContext
 
         // Eğer IEntityTypeConfiguration sınıfların varsa yükler
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+        modelBuilder.Entity<Album>()
+        .HasMany(a => a.Photos)
+        .WithOne(p => p.Album)
+        .HasForeignKey(p => p.AlbumId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BucketItem>()
+        .Property(b => b.Id)
+        .ValueGeneratedOnAdd(); // <- Bu satır auto-increment yapıyor
+
+        // WishlistItem Id auto-increment
+        modelBuilder.Entity<WishlistItem>()
+            .Property(w => w.Id)
+            .ValueGeneratedOnAdd(); // <- Bu satır da auto-increment yapıyor
 
         // Tüm entity türlerini dön
         foreach (var entity in modelBuilder.Model.GetEntityTypes())

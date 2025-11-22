@@ -2,11 +2,10 @@
 
 namespace SharedFutureApp.Dtos.WishlistDtos;
 
-public class WishlistCreateDto
+public class WishlistUpdateDto
 {
 
     public string Title { get; set; } = default!;
     public DateTimeOffset? EventDate { get; set; }
     public bool IsDone { get; set; }
-   
 }

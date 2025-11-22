@@ -17,47 +17,12 @@ public class WishlistController : ControllerBase
         _context = context;
     }
 
-    // ---------------------------
-    // GET ALL (Active + Done)
-    // ---------------------------
     [HttpGet]
     public async Task<ActionResult<IEnumerable<WishlistItem>>> GetAll()
     {
-        return await _context.WishlistItems
-            .Include(x => x.Photo)
-            .OrderBy(x => x.CreatedAt)
-            .ToListAsync();
+        return await _context.WishlistItems.OrderBy(x => x.CreatedAt).ToListAsync();
     }
 
-    // ---------------------------
-    // GET ACTIVE ONLY
-    // ---------------------------
-    [HttpGet("active")]
-    public async Task<ActionResult<IEnumerable<WishlistItem>>> GetActive()
-    {
-        return await _context.WishlistItems
-            .Where(x => x.IsDone == false)
-            .Include(x => x.Photo)
-            .OrderBy(x => x.CreatedAt)
-            .ToListAsync();
-    }
-
-    // ---------------------------
-    // GET DONE (HISTORY)
-    // ---------------------------
-    [HttpGet("done")]
-    public async Task<ActionResult<IEnumerable<WishlistItem>>> GetDone()
-    {
-        return await _context.WishlistItems
-            .Where(x => x.IsDone == true)
-            .Include(x => x.Photo)
-            .OrderByDescending(x => x.CompletedAt)
-            .ToListAsync();
-    }
-
-    // ---------------------------
-    // CREATE
-    // ---------------------------
     [HttpPost]
     public async Task<ActionResult<WishlistItem>> Create([FromBody] WishlistCreateDto dto)
     {
@@ -65,20 +30,22 @@ public class WishlistController : ControllerBase
         {
             Title = dto.Title,
             EventDate = dto.EventDate,
-            CreatedAt = DateTime.Now,
-            IsDone = false,
-            PhotoId = dto.PhotoId
+            CreatedAt = DateTimeOffset.Now,
+            IsDone = false
         };
 
         _context.WishlistItems.Add(item);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(Create), new { id = item.Id }, item);
+        return new JsonResult(new
+        {
+            id = item.Id,
+            title = item.Title,
+            eventDate = item.EventDate,
+            isDone = item.IsDone
+        });
     }
 
-    // ---------------------------
-    // UPDATE (Done + Edit)
-    // ---------------------------
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] WishlistUpdateDto dto)
     {
@@ -87,12 +54,11 @@ public class WishlistController : ControllerBase
 
         item.Title = dto.Title;
         item.EventDate = dto.EventDate;
-        item.PhotoId = dto.PhotoId;
 
         if (dto.IsDone && !item.IsDone)
         {
             item.IsDone = true;
-            item.CompletedAt = DateTime.Now;
+            item.CompletedAt = DateTimeOffset.Now;
         }
         else if (!dto.IsDone)
         {
@@ -104,9 +70,6 @@ public class WishlistController : ControllerBase
         return NoContent();
     }
 
-    // ---------------------------
-    // DELETE
-    // ---------------------------
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -115,7 +78,6 @@ public class WishlistController : ControllerBase
 
         _context.WishlistItems.Remove(item);
         await _context.SaveChangesAsync();
-
         return NoContent();
     }
 }
