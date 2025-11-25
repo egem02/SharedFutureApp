@@ -1,119 +1,176 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting; // KRİTİK: IHostEnvironment için ekleyin
+using Microsoft.AspNetCore.Hosting; // IWebHostEnvironment hala tanımlı olabilir ama kullanmayacağız
 using SharedFutureApp.Data;
-using SharedFutureApp.Dtos;
 using SharedFutureApp.Models;
-
-namespace SharedFutureApp.Controllers;
+using System.IO;
+using SharedFutureApp.Dtos.AlbumDtos;
 
 [Route("api/[controller]")]
 [ApiController]
 public partial class PhotoController : ControllerBase
 {
-    private readonly IWebHostEnvironment _env;
     private readonly ApplicationDbContext _context;
+    // KRİTİK: IWebHostEnvironment yerine IHostEnvironment kullanıyoruz
+    private readonly IHostEnvironment _hostEnv;
 
-    public PhotoController(ApplicationDbContext context, IWebHostEnvironment env)
+    public PhotoController(ApplicationDbContext context, IHostEnvironment hostEnv)
     {
         _context = context;
-        _env = env;
+        _hostEnv = hostEnv;
     }
 
-    // Tüm fotoğrafları getir (albüm bilgisi ile)
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<object>>> GetAll()
+    /// <summary>
+    /// Yeni bir fotoğrafı yükler ve notuyla birlikte veritabanına kaydeder.
+    /// </summary>
+    [HttpPost("upload")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Upload([FromForm] IFormFile photo, [FromForm] string? note)
     {
+        if (photo is null || photo.Length == 0)
+            return BadRequest(new { message = "Photo file is required." });
+
+        // KRİTİK YOL: Proje kök dizinini (ContentRootPath) kullan
+        var contentRootPath = _hostEnv.ContentRootPath;
+
+        // Proje Kökündeki "uploads" klasörünü hedefle (Daha güvenli erişim)
+        var uploadFolder = Path.Combine(contentRootPath, "uploads");
+
+        if (!Directory.Exists(uploadFolder))
+            Directory.CreateDirectory(uploadFolder);
+
+        // Dosya adı ve yolu oluşturma
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(photo.FileName)}";
+        var filePath = Path.Combine(uploadFolder, fileName);
+
+        // Diske kaydetme
+        try
+        {
+            await using var stream = new FileStream(filePath, FileMode.Create);
+            await photo.CopyToAsync(stream);
+
+            // Hata ayıklama logu (Eğer çalışırsa)
+            Console.WriteLine($"DEBUG: File successfully saved to path: {filePath}");
+        }
+        catch (Exception ex)
+        {
+            // KRİTİK: Diske kaydetme hatasını tarayıcıya döndürerek kesin tanıyı koy
+            Console.WriteLine($"KRİTİK HATA: File save FAILED. Path: {filePath}. Error: {ex.Message}");
+            return StatusCode(500, new { message = $"File save FAILED. Error: {ex.Message}" });
+        }
+
+        // Model oluşturma ve veritabanına kaydetme
+        var newPhoto = new Photo
+        {
+            FileName = fileName,
+            // FilePath'i tarayıcının erişebileceği URL olarak kaydet
+            FilePath = $"/upload/{fileName}",
+            UploadedAt = DateTimeOffset.Now,
+            Note = note
+        };
+
+        _context.Photos.Add(newPhoto);
+        await _context.SaveChangesAsync();
+
+        return Ok(newPhoto);
+    }
+
+    // ... (Kalan tüm metodlar aynı kalır)
+
+    /// <summary>
+    /// Albüme atanmamış tüm fotoğrafları döndürür.
+    /// </summary>
+    [HttpGet("unassigned")]
+    public async Task<IActionResult> GetUnassigned()
+    {
+        // Yalnızca JS'in ihtiyacı olan alanları seçiyoruz.
         var photos = await _context.Photos
-            .Include(p => p.Album)
+            .Where(p => p.AlbumId == null)
             .Select(p => new
             {
                 p.Id,
                 p.FileName,
                 p.FilePath,
                 p.UploadedAt,
-                p.AlbumId,            // PascalCase
-                AlbumName = p.Album != null ? p.Album.Name : null // PascalCase
+                p.Note
             })
             .ToListAsync();
 
         return Ok(photos);
     }
 
-    // Fotoğraf yükleme endpoint (albüm desteği ile)
-    [HttpPost("upload")]
-    [Consumes("multipart/form-data")]
-    public async Task<ActionResult<object>> Upload([FromForm] PhotoUploadDto dto)
+    /// <summary>
+    /// Belirtilen fotoğrafın notunu günceller.
+    /// </summary>
+    [HttpPut("{id}/note")]
+    public async Task<IActionResult> UpdateNote(int id, [FromBody] string note)
     {
-        if (dto.Photo == null)
-            return BadRequest("Fotoğraf dosyası gereklidir.");
+        var photo = await _context.Photos.FindAsync(id);
 
-        // Albüm varsa kontrol et
-        if (dto.AlbumId.HasValue)
-        {
-            var album = await _context.Albums.FindAsync(dto.AlbumId.Value);
-            if (album == null)
-                return BadRequest("Albüm bulunamadı");
-        }
+        if (photo is null)
+            return NotFound(new { message = $"Photo with ID {id} not found." });
 
-        // Kayıt klasörü
-        var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
-        if (!Directory.Exists(uploadsFolder))
-            Directory.CreateDirectory(uploadsFolder);
+        photo.Note = note;
 
-        var fileName = Guid.NewGuid() + Path.GetExtension(dto.Photo.FileName);
-        var filePath = Path.Combine(uploadsFolder, fileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await dto.Photo.CopyToAsync(stream);
-        }
-
-        var photo = new Photo
-        {
-            FileName = fileName,
-            FilePath = "/uploads/" + fileName,
-            UploadedAt = DateTimeOffset.Now,
-            AlbumId = dto.AlbumId
-        };
-
-        _context.Photos.Add(photo);
+        _context.Photos.Update(photo);
         await _context.SaveChangesAsync();
 
-        // Albüm adı ile döndür
-        var albumName = dto.AlbumId.HasValue
-            ? await _context.Albums
-                .Where(a => a.Id == dto.AlbumId.Value)
-                .Select(a => a.Name)
-                .FirstOrDefaultAsync()
-            : null;
+        return Ok(new { photo.Id, photo.Note });
+    }
+    [HttpGet("details/{id}")]
+    public async Task<IActionResult> GetPhotoDetails(int id)
+    {
+    
+        var currentPhoto = await _context.Photos.FindAsync(id);
+        if (currentPhoto == null) return NotFound();
 
+   
+        var albums = await _context.Albums
+            .Select(a => new { a.Id, a.Name })
+            .ToListAsync();
+
+        // 3. Önceki ve Sonraki Fotoğrafı Bulma Mantığı
+        // Not: Bu basit bir ID sıralamasıdır. Tarihe göre sıralıyorsanız OrderBy kullanmalısınız.
+
+        var nextPhotoId = await _context.Photos
+            .Where(p => p.Id > id)
+            .OrderBy(p => p.Id)
+            .Select(p => p.Id)
+            .FirstOrDefaultAsync();
+
+        var prevPhotoId = await _context.Photos
+            .Where(p => p.Id < id)
+            .OrderByDescending(p => p.Id)
+            .Select(p => p.Id)
+            .FirstOrDefaultAsync();
+
+        // 4. Sonucu Döndür
         return Ok(new
         {
-            photo.Id,
-            photo.FileName,
-            photo.FilePath,
-            photo.UploadedAt,
-            photo.AlbumId,   // PascalCase
-            AlbumName = albumName       // PascalCase
+            Photo = currentPhoto,
+            NextId = nextPhotoId, // 0 gelirse sonraki yok demektir
+            PrevId = prevPhotoId, // 0 gelirse önceki yok demektir
+            Albums = albums
         });
     }
 
-    // Fotoğraf sil
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    // Albüme Fotoğraf Ekleme Endpoint'i
+    [HttpPost("add-to-album")]
+    public async Task<IActionResult> AddPhotoToAlbum([FromBody] AddToAlbumRequest request)
     {
-        var photo = await _context.Photos.FindAsync(id);
-        if (photo == null)
-            return NotFound();
+        var photo = await _context.Photos.FindAsync(request.PhotoId);
+        var album = await _context.Albums.Include(a => a.Photos).FirstOrDefaultAsync(a => a.Id == request.AlbumId);
 
-        // Fiziksel dosyayı da sil
-        var fullPath = Path.Combine(_env.WebRootPath, "uploads", photo.FileName);
-        if (System.IO.File.Exists(fullPath))
-            System.IO.File.Delete(fullPath);
+        if (photo == null || album == null) return NotFound("Fotoğraf veya Albüm bulunamadı.");
 
-        _context.Photos.Remove(photo);
-        await _context.SaveChangesAsync();
+        if (!album.Photos.Contains(photo))
+        {
+            album.Photos.Add(photo);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Fotoğraf albüme eklendi!" });
+        }
 
-        return Ok();
+        return BadRequest(new { message = "Bu fotoğraf zaten albümde mevcut." });
     }
 }

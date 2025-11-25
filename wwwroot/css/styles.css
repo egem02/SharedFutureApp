@@ -6,7 +6,7 @@
 /* Global Paw Cursor */
 /* ===========================================
  */
-*{
+* {
     cursor: url('/paw/WhiteGrey-Cat-Paw-PNG.png') 16 16,auto;
 }
 
@@ -260,6 +260,7 @@ h1 {
         font-size: 1rem;
     }
 }
+
 .add-item {
     margin: 1rem 0;
 }
@@ -349,6 +350,121 @@ h1 {
         padding: 0.3rem 0.8rem;
         border-radius: 10px;
     }
+/* ===============================
+   PHOTOS PAGE - GÜNCELLEME
+   =============================== */
+
+/* Upload alanı */
+.photo-upload-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    border: 2px dashed rgba(255,255,255,0.3);
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.photo-upload-area:hover {
+    background-color: rgba(255,255,255,0.15);
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+}
+
+/* File input */
+.photo-upload-area .file-input {
+    font-size: 1.2rem;
+    padding: 0.8rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background-color: rgba(255,255,255,0.05);
+    cursor: pointer;
+}
+
+/* Note textarea */
+.photo-upload-area .note-textarea {
+    font-size: 1.2rem;
+    min-height: 100px;
+    padding: 0.8rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background-color: rgba(255,255,255,0.05);
+    resize: vertical;
+}
+
+/* Upload butonu */
+.photo-upload-area .button {
+    font-size: 1.4rem;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.photo-upload-area .button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+/* Fotoğraf grid */
+.photo-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+/* Fotoğraf kartı */
+.photo-card {
+    background-color: rgba(255,255,255,0.08);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.photo-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+}
+
+.photo-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+/* Modal ve buttonlar responsive */
+@media (max-width: 768px) {
+    .photo-upload-area {
+        max-width: 90%;
+        padding: 1rem;
+    }
+
+    .photo-upload-area .button {
+        font-size: 1.2rem;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .photo-upload-area .note-textarea {
+        font-size: 1rem;
+        min-height: 80px;
+    }
+
+    .photo-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    .photo-card img {
+        height: 120px;
+    }
+}
+
 
 /* Delete butonu özel renk */
 .btn-delete {
@@ -391,14 +507,118 @@ h1 {
         border-color: #ff6f91; /* Hoverda çerçeve rengi değişir */
     }
 
+/* ===============================
+   PHOTOS PAGE - GÜNCELLEME
+   =============================== */
 
-/* Responsive */
-@media (max-width: 600px) {
+/* Upload alanı */
+.photo-upload-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    border: 2px dashed rgba(255,255,255,0.3);
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+    .photo-upload-area:hover {
+        background-color: rgba(255,255,255,0.15);
+        transform: scale(1.02);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    }
+
+    /* File input */
+    .photo-upload-area .file-input {
+        font-size: 1.2rem;
+        padding: 0.8rem;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background-color: rgba(255,255,255,0.05);
+        cursor: pointer;
+    }
+
+    /* Note textarea */
+    .photo-upload-area .note-textarea {
+        font-size: 1.2rem;
+        min-height: 100px;
+        padding: 0.8rem;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background-color: rgba(255,255,255,0.05);
+        resize: vertical;
+    }
+
+    /* Upload butonu */
+    .photo-upload-area .button {
+        font-size: 1.4rem;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .photo-upload-area .button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+/* Fotoğraf grid */
+.photo-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+/* Fotoğraf kartı */
+.photo-card {
+    background-color: rgba(255,255,255,0.08);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .photo-card:hover {
+        transform: translateY(-5px) scale(1.03);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+    }
+
+    .photo-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+    }
+
+/* Modal ve buttonlar responsive */
+@media (max-width: 768px) {
+    .photo-upload-area {
+        max-width: 90%;
+        padding: 1rem;
+    }
+
+        .photo-upload-area .button {
+            font-size: 1.2rem;
+            padding: 0.8rem 1.5rem;
+        }
+
+        .photo-upload-area .note-textarea {
+            font-size: 1rem;
+            min-height: 80px;
+        }
+
     .photo-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     }
 
     .photo-card img {
         height: 120px;
     }
 }
+

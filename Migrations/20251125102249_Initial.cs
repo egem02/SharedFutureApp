@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SharedFutureApp.Migrations
 {
     /// <inheritdoc />
-    public partial class Identity : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -43,6 +43,20 @@ namespace SharedFutureApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Memorizes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Memorizes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WishlistItems",
                 columns: table => new
                 {
@@ -68,7 +82,8 @@ namespace SharedFutureApp.Migrations
                     FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UploadedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    AlbumId = table.Column<int>(type: "int", nullable: true)
+                    AlbumId = table.Column<int>(type: "int", nullable: true),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -92,6 +107,9 @@ namespace SharedFutureApp.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BucketItems");
+
+            migrationBuilder.DropTable(
+                name: "Memorizes");
 
             migrationBuilder.DropTable(
                 name: "Photos");

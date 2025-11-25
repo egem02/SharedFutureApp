@@ -1,4 +1,5 @@
-﻿export function initBucket() {
+﻿// bucket.js
+export function initBucket() {
     const addBtn = document.getElementById("bucketAddBtn");
     const input = document.getElementById("bucketInput");
     const dateInput = document.getElementById("bucketDate");
@@ -10,9 +11,9 @@
     const toggleBtn = document.getElementById("bucketToggleBtn");
     const sections = document.getElementById("bucketSections");
 
+    // SHOW/HIDE toggle
     toggleBtn?.addEventListener("click", () => {
-        const style = window.getComputedStyle(sections);
-        if (style.display === "none") {
+        if (sections.style.display === "none") {
             sections.style.display = "block";
             toggleBtn.textContent = "Hide List";
         } else {
@@ -20,7 +21,6 @@
             toggleBtn.textContent = "Show List";
         }
     });
-
 
     // Mevcut öğeleri yükle
     fetch("/api/bucket")
@@ -43,12 +43,6 @@
 
             if (!res.ok) return console.error("POST failed", res.status);
             const data = await res.json();
-
-            if (!data.id) {
-                console.warn("POST sonrası id yok:", data);
-                return;
-            }
-
             addToUI(data);
             input.value = "";
             dateInput.value = "";
@@ -58,7 +52,7 @@
     });
 
     function addToUI(item) {
-        if (!item.id) return; // id yoksa ekleme yapma
+        if (!item.id) return;
 
         const div = document.createElement("div");
         div.className = "list-item";
@@ -84,10 +78,10 @@
 
         btnGroup.appendChild(doneBtn);
         btnGroup.appendChild(deleteBtn);
-
         div.appendChild(span);
         div.appendChild(btnGroup);
 
+        // Tarihe göre ekleme
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const itemDate = item.targetDate ? new Date(item.targetDate) : null;
         if (itemDate) itemDate.setHours(0, 0, 0, 0);
@@ -118,4 +112,5 @@
     }
 }
 
-
+// window ile export et
+window.initBucket = initBucket;

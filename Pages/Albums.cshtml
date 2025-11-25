@@ -1,0 +1,36 @@
+﻿@page "/Albums"
+
+<body data-page="albums">
+    <link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
+
+    <div class="container">
+        <h1>📁 Albums 📁</h1>
+
+        <!-- Yeni albüm ekleme -->
+        <div class="add-item" style="margin-bottom:15px;">
+            <input type="text" id="newAlbumName" placeholder="New Album Name" />
+            <button id="createAlbumBtn" class="button btn-purple">Create Album</button>
+        </div>
+
+        <!-- Albümler -->
+        <div id="albumContainer" class="album-container"></div>
+
+        <div class="mt-4">
+            <a class="button btn-purple" href="/">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Fotoğraf modal -->
+    <div id="photoModal" class="modal">
+        <span id="closeModal" class="close-btn">×</span>
+        <img id="modalImage" class="modal-img" />
+        <div id="photoInfo" class="modal-note"></div>
+        <p id="photoDate"></p>
+        <textarea id="modalNote" placeholder="Edit note here..."></textarea>
+        <button id="saveNote" class="button btn-pink">Save Note</button>
+        <button id="prevPhoto" class="nav-btn">⟨</button>
+        <button id="nextPhoto" class="nav-btn">⟩</button>
+    </div>
+
+    <script type="module" src="js/album-view.js"></script>
+</body>

@@ -6,6 +6,6 @@ public class Album
 
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
-    public List <Photo> Photos { get; set; } = new();
+    public List<Photo> Photos { get; set; } = new();
 
 }

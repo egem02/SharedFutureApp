@@ -71,6 +71,25 @@ namespace SharedFutureApp.Migrations
                     b.ToTable("BucketItems");
                 });
 
+            modelBuilder.Entity("SharedFutureApp.Models.Memorize", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Memorizes");
+                });
+
             modelBuilder.Entity("SharedFutureApp.Models.Photo", b =>
                 {
                     b.Property<int>("Id")
@@ -88,6 +107,9 @@ namespace SharedFutureApp.Migrations
 
                     b.Property<string>("FilePath")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("UploadedAt")

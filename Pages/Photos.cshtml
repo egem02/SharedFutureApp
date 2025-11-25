@@ -1,50 +1,82 @@
-﻿@page "/photos"
+﻿
+@page "/photos"
 
-<body data-page="photos">
-    <link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
+<!-- CSS -->
+<link rel="stylesheet" href="css/styles.css?v=@DateTime.Now.Ticks" />
+<link rel="stylesheet" href="css/modal.css?v=@DateTime.Now.Ticks" />
 
-    <!-- Arka plan müziği -->
-    <audio id="bg-audio" autoplay loop>
-        <source src="/audio/tekrardan.mp3" type="audio/mpeg">
-    </audio>
+<div class="container">
 
-    <div class="container">
-        <h1>📸 Photo Gallery 📸</h1>
+    <h1 class="page-title">📸 Photos 📸</h1>
 
-        <!-- Fotoğraf yükleme ve albüm oluşturma alanı -->
-        <div class="add-item">
-            <!-- Fotoğraf yükleme -->
-            <input type="file" id="photoFileInput" />
-            <select id="albumSelect">
-                <option value="">No Album</option>
-            </select>
-            <button id="photoUploadBtn" class="button btn-pink">Upload</button>
+    <!-- Upload Alanı -->
+    <div class="photo-upload-area">
 
-            <!-- Yeni albüm oluşturma -->
-            <div class="add-item" style="margin-top:10px;">
-                <input type="text" id="newAlbumName" placeholder="Enter Album Name" />
-                <button id="createAlbumBtn" class="button btn-purple">Create Album</button>
+        <!-- Fotoğraf seçme -->
+        <input type="file" id="photoFileInput" class="file-input" />
+
+        <!-- Not yazma alanı -->
+        <textarea id="memorizeText"
+                  placeholder="Write a note for this photo..."
+                  class="note-textarea"></textarea>
+
+        <!-- Boşluk -->
+        <div style="height: 15px;"></div>
+
+        <!-- Upload butonu -->
+        <button id="photoUploadBtn" class="button btn-pink full-width">
+            Upload Photo & Note
+        </button>
+    </div>
+
+    <!-- Atanmamış fotoğraflar container -->
+    <div id="unassignedPhotoContainer" class="photo-grid"></div>
+
+</div>
+
+<!-- FOTOĞRAF MODALI -->
+<div id="photoModal" class="photo-modal" style="display:none;">
+    <span id="closeModal" class="modal-close">&times;</span>
+
+    <div class="modal-content-wrapper">
+        <img id="modalImage" class="modal-img" src="" alt="Photo" />
+        <div class="modal-details">
+            <div class="modal-text-content">
+                <h3 style="color: #8a2be2;">Photo Details</h3>
+                <p><strong>Note:</strong> <span id="photoInfo"></span></p>
+                <p><strong>Date:</strong> <span id="photoDate"></span></p>
             </div>
-        </div>
 
-        <!-- Albüm filtresi -->
-        <div class="list-item-filter" style="margin:10px 0;">
-            <label for="albumFilter">Filter by Album:</label>
-            <select id="albumFilter">
-                <option value="">All Photos</option>
-            </select>
-        </div>
+            <div class="modal-edit-area">
+                <textarea id="modalNote" placeholder="Update note..."></textarea>
+                <button id="saveNote" class="button btn-purple">Save Note</button>
+            </div>
 
-        <!-- Fotoğrafların listeleneceği alan -->
-        <div class="list-container" id="photoContainer"></div>
+            <!-- YENİ EKLENEN ALBÜM YÖNETİM ALANI -->
+            <div class="modal-album-area">
+                <h4 style="color: #8a2be2; margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">Add to Album</h4>
+                <!-- photo-module.js'te kullanılacak ID ve data alanı -->
+                <select id="albumSelect" data-photo-id="0" class="select-input full-width"></select>
+                <!-- Global fonksiyon çağrısı JS modülünde window'a atanacak -->
+                <button id="addPhotoToAlbumBtn" class="button btn-green full-width" onclick="addPhotoToSelectedAlbum()">
+                    Add to Album
+                </button>
+            </div>
+            <!-- SON -->
 
-        <div class="mt-4">
-            <a class="button btn-pink" href="/">Back to Home</a>
         </div>
     </div>
 
-    <!-- Scriptler -->
-    <script src="js/photos.js" defer></script>
-    <script src="js/album.js" defer></script>
-    <script src="js/app-init.js" defer></script>
-</body>
+    <button id="prevPhoto" class="modal-nav-btn">⟨</button>
+    <button id="nextPhoto" class="modal-nav-btn">⟩</button>
+</div>
+
+<!-- Arka plan müziği -->
+<audio id="bgMusic" src="/audio/tekrardan.mp3" autoplay loop></audio>
+
+<!-- JS Module Import ve init -->
+<script type="module">
+    // photos.js dosyasından initPhotos fonksiyonunu içeri al
+    import { initPhotos } from '/js/photos.js?v=@DateTime.Now.Ticks';
+    const photoModule = initPhotos(); // DOM listeners artık çalışıyor
+</script>

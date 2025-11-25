@@ -8,13 +8,16 @@
 
   <ItemGroup>
     <Compile Remove="Services\**" />
-    <Compile Remove="wwwroot\upload\**" />
     <Content Remove="Services\**" />
-    <Content Remove="wwwroot\upload\**" />
     <EmbeddedResource Remove="Services\**" />
-    <EmbeddedResource Remove="wwwroot\upload\**" />
     <None Remove="Services\**" />
-    <None Remove="wwwroot\upload\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Models\Album.cs" />
+    <Content Include="Models\BucketItem.cs" />
+    <Content Include="Models\Photo.cs" />
+    <Content Include="Models\WishlistItem.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,10 +32,6 @@
 		  <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>

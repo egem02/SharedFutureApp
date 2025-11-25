@@ -15,6 +15,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<WishlistItem> WishlistItems { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<Album> Albums { get; set; }
+    public DbSet<Memorize> Memorizes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

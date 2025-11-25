@@ -79,7 +79,19 @@ public partial class AlbumController : ControllerBase
             PhotoCount = 0
         });
     }
+    [HttpPut("/api/photo/{photoId}/assignAlbum")]
+    public async Task<IActionResult> AssignPhotoToAlbum(int photoId, [FromBody] AssignAlbumDto dto)
+    {
+        var photo = await _context.Photos.FindAsync(photoId);
+        if (photo == null)
+            return NotFound();
 
+        // Albüm ID atanıyor
+        photo.AlbumId = dto.AlbumId;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Photo assigned to album successfully" });
+    }
     // Albüm sil (fotoğraflarıyla birlikte)
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
@@ -96,4 +108,27 @@ public partial class AlbumController : ControllerBase
 
         return Ok(new { message = "Album deleted successfully" });
     }
+
+    // /api/album/{id}/photos
+    [HttpGet("{id}/photos")]
+    public async Task<ActionResult<IEnumerable<object>>> GetPhotosByAlbum(int id)
+    {
+        var album = await _context.Albums
+            .Include(a => a.Photos)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (album == null)
+            return NotFound();
+
+        var photos = album.Photos.Select(p => new
+        {
+            p.Id,
+            p.FileName,
+            p.FilePath,
+            p.UploadedAt
+        }).ToList();
+
+        return Ok(photos);
+    }
+
 }

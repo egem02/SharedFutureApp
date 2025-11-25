@@ -1,49 +1,54 @@
-﻿
-document.addEventListener("DOMContentLoaded", () => {
+﻿document.addEventListener("DOMContentLoaded", async () => {
     const page = document.body.dataset.page;
 
-    // Sayfaya özel modüller
-    if (page === "bucket") {
-        import('./bucket.js').then(module => module.initBucket());
+    // -----------------------------
+    // Sayfa bazlı modüller
+    // -----------------------------
+    if (page === "photos") {
+        const photosModule = await import('./photos.js');
+        const memorizeModule = await import('./memorize.js');
+
+        // DOM %100 hazır
+        photosModule.initPhotos();
+        if (memorizeModule.initMemorize) memorizeModule.initMemorize();
+
+    } else if (page === "albums") {
+        (async () => {
+            const albumViewModule = await import('./album-view.js');
+            albumViewModule.initAlbums();
+        })();
+    } else if (page === "bucket") {
+        (async () => {
+            const bucketModule = await import('./bucket.js');
+            bucketModule.initBucket(); // Bucket sayfasını başlat
+        })();
     } else if (page === "wishlist") {
-        import('./wishlist.js').then(module => module.initWishlist());
-    } else if (page === "photos") {
-        import('./photos.js').then(module => module.initPhotos());
-        import('./album.js').then(module => module.initAlbum());
+        (async () => {
+            const wishlistModule = await import('./wishlist.js');
+            wishlistModule.initWishlist();
+        })();
     }
 
+    // -----------------------------
     // Arka plan müziği
+    // -----------------------------
     const audio = document.getElementById("bg-audio");
     if (!audio) return;
 
-    let song = "";
-    switch (page) {
-        case "":
-        case "/":
-            song = "/audio/veben.mp3"; // Ana sayfa
-            break;
-        case "bucket":
-            song = "/audio/dem.mp3";
-            break;
-        case "wishlist":
-            song = "/audio/sadece.mp3";
-            break;
-        case "photos":
-            song = "/audio/tekrardan.mp3";
-            break;
-    }
+    const musicMap = {
+        "": "/audio/veben.mp3",
+        "bucket": "/audio/dem.mp3",
+        "wishlist": "/audio/sadece.mp3",
+        "photos": "/audio/tekrardan.mp3",
+        "albums": "/audio/tekrardan.mp3"
+    };
 
+    audio.src = musicMap[page] || "";
 
-    audio.src = song;
-
-    // İlk kullanıcı etkileşimi ile çal
     function startMusic() {
         audio.play().catch(err => console.log("Audio play blocked:", err));
         document.removeEventListener("click", startMusic);
     }
 
-    // Sayfa yüklendiğinde veya kullanıcı tıkladığında çal
     document.addEventListener("click", startMusic);
-
-   
 });
